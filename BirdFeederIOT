@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Bird Feeder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .sensor-data {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        .control-buttons {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>IoT Bird Feeder</h1>
+        <p>Monitor and control your bird feeder in real-time</p>
+
+        <div class="sensor-data">
+            <h2>Sensor Data</h2>
+            <p>Weight Sensor: <span id="weightValue">Loading...</span></p>
+            <p>Ultrasonic Sensor: <span id="ultrasonicValue">Loading...</span></p>
+        </div>
+
+        <div class="control-buttons">
+            <h2>Control</h2>
+            <button onclick="controlServo('on')">Open Feeder</button>
+            <button onclick="controlServo('off')">Close Feeder</button>
+        </div>
+    </div>
+
+    <script>
+        const authToken = 'YourAuthToken'; // Replace with your Blynk Auth Token
+
+        function updateSensorData() {
+            fetch(`http://blynk-cloud.com/${authToken}/get/V1`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('weightValue').textContent = data[0];
+                });
+
+            fetch(`http://blynk-cloud.com/${authToken}/get/V2`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('ultrasonicValue').textContent = data[0];
+                });
+        }
+
+        function controlServo(state) {
+            const pin = state === 'on' ? 'V3' : 'V4';
+            fetch(`http://blynk-cloud.com/${authToken}/update/${pin}?value=1`);
+        }
+
+        // Update sensor data every 2 seconds
+        setInterval(updateSensorData, 2000);
+    </script>
+
+</body>
+</html>
